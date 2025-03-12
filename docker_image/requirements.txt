@@ -1,0 +1,30 @@
+# 数据分析常用库
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+
+# 文档处理库
+openpyxl
+python-docx
+PyMuPDF
+PyPDF2
+Pillow
+
+# 数据库连接库
+psycopg2
+
+# OpenAI 接口调用库
+openai
+
+# 其他常见的库（例如：requests）
+requests
+
+pytesseract
+pdf2image
+
+browser_use
+pydantic
+langchain_community
+langchain_openai

@@ -1,0 +1,7 @@
+llama-index-core
+llama-index-llms-openai
+langchain-openai
+llama-index-llms-ollama
+openai
+python-dotenv
+aiohttp
