@@ -5,7 +5,7 @@ from llama_index.llms.langchain import LangChainLLM
 from prompts import CODE_GENERATION_PROMPT
 
 def create_code_generator_tool(
-    model_name: str = "gpt-4o"
+    model_name: str = "gpt-4o-mini"
 ) -> FunctionTool:
     """创建代码生成工具"""
     
