@@ -3,6 +3,8 @@ from llama_index.core.tools import FunctionTool
 from langchain_openai import ChatOpenAI
 from llama_index.llms.langchain import LangChainLLM
 from prompts import CODE_GENERATION_PROMPT
+from dotenv import load_dotenv
+load_dotenv()
 
 def create_code_generator_tool(
     model_name: str = "gpt-4o-mini"
@@ -27,7 +29,11 @@ def create_code_generator_tool(
         Returns:
             str: 生成的Python代码
         """
-        llm = LangChainLLM(llm=ChatOpenAI(model=model_name))
+        llm = LangChainLLM(llm=ChatOpenAI(
+                model=os.getenv('MODEL_NAME', 'deepseek-v3'),
+                base_url=os.getenv('API_BASE_URL'),
+                api_key=os.getenv('DEEPSEEK_API_KEY')
+            ))
         
         prompt = f"""{CODE_GENERATION_PROMPT}
 

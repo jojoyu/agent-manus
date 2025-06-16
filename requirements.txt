@@ -1,7 +1,11 @@
 llama-index-core
 llama-index-llms-openai
+llama-index-llms-openai-like
 langchain-openai
 llama-index-llms-ollama
 openai
 python-dotenv
 aiohttp
+langchain-community
+langgraph
+

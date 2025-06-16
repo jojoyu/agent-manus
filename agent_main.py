@@ -12,8 +12,6 @@ from tool_code_executor import create_code_executor_docker_tool,create_code_exec
 from tool_code_generator import create_code_generator_tool
 from tool_webpage_crawler import create_webpage_crawler_tool
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openai_like import OpenAILike
-from llama_index.llms.openllm import OpenLLM
 from prompts import REACT_AGENT_CONTEXT,DEFAULT_INITIAL_PLAN_PROMPT,DEFAULT_PLAN_REFINE_PROMPT
 from llama_index.core.agent import (
     StructuredPlannerAgent,
@@ -22,6 +20,8 @@ from llama_index.core.agent import (
 )
 import shutil
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # 全局变量 - Agent映射表（按用户ID组织）
 _agents: Dict[str, ReActAgent] = {}
@@ -42,7 +42,11 @@ def get_agent(
 
         # 如果没有提供LLM，创建默认的LLM
         if llm is None:
-            llm = LangChainLLM(llm=ChatOpenAI(model="doubao-1.5-256k"))
+            llm = LangChainLLM(llm=ChatOpenAI(
+                    model=os.getenv('MODEL_NAME', 'deepseek-v3'),
+                    base_url=os.getenv('API_BASE_URL'),
+                    api_key=os.getenv('DEEPSEEK_API_KEY')
+                ))
         
         # 创建用户专属的工具实例
         tool_code_executor_docker = create_code_executor_docker_tool()
