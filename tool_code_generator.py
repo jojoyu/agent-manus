@@ -1,3 +1,5 @@
+import os
+
 from typing import Dict, Any
 from llama_index.core.tools import FunctionTool
 from langchain_openai import ChatOpenAI
@@ -7,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def create_code_generator_tool(
-    model_name: str = "gpt-4o-mini"
+    model_name: str = "gpt-4o"
 ) -> FunctionTool:
     """创建代码生成工具"""
     

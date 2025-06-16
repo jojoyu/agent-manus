@@ -42,6 +42,14 @@ cd docker_image
 sh build.sh
 ```
 
+export OPENAI_API_KEY=sk-b5oCe3KzVz4d0NvM41D5C27a5cF349AdA53f8dEbFfDaEa54
+export OPENAI_API_BASE=https://cdp-oneapi.in.deltaverse-intl.com/v1
+export OPENAI_BASE_URL=https://cdp-oneapi.in.deltaverse-intl.com/v1
+# BASIC_MODEL:
+#   base_url: https://cdp-oneapi.in.deltaverse-intl.com/v1
+#   model: "gpt-4o"
+#   api_key: sk-b5oCe3KzVz4d0NvM41D5C27a5cF349AdA53f8dEbFfDaEa54
+
 4. 运行程序：
 
 ```bash

@@ -3,14 +3,21 @@ CODE_GENERATION_PROMPT = """你是一个专业的Python代码生成助手。请�
 2. 遵循PEP 8编码规范
 3. 包含必要的异常处理
 4. 优先使用内置函数和标准库，使用尽可能少的第三方库来完成任务
-5. 如果使用OpenAI的大模型,请使用openai库,默认使用gpt-4o-mini模型
+5. 如果使用OpenAI的大模型,请使用openai库,默认使用gpt-4o模型
 6. OpenAI的API_KEY与API_BASE已经在环境中设置,在代码中无需设置api_key与api_base参数
 7. 生成的新文件保存在当前工作目录中
 8. 默认需要处理的文件会放在当前工作目录下,除非我明确指定了路径
 9. 除非指定了文件名,否则指的是同类型的所有文件
-10.自然语言处理使用gpt-4o-mini大模型来完成
+10.自然语言处理使用gpt-4o大模型来完成
 11.图片识别与理解使用多模态大模型来完成
 11.生成的代码将在容器中执行，不要请求用户输入
+12.如果生成的代码需要在容器中执行,画图的话，设置matplotlib中文字体的方式
+import matplotlib as mpl
+mpl.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei']
+mpl.rcParams['axes.unicode_minus'] = False
+
+13.如果生成的代码需要在容器中执行,请确保代码中包含了必要的导入语句
+14.如果生成的代码需要在容器中执行,请确保代码中包含了必要的环境变量设置语句
 
 生成的代码需要满足用户的具体需求，同时确保代码质量和安全性。"""
 

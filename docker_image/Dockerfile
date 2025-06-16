@@ -48,6 +48,13 @@ RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pyth
 RUN playwright install chromium \
     && playwright install-deps chromium
 
+# 安装中文字体和字体配置
+RUN apt-get update && apt-get install -y fonts-wqy-zenhei \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建字体缓存
+RUN python -c 'import matplotlib; matplotlib.font_manager._rebuild()'
+
 # 创建启动脚本
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
