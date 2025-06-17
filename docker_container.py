@@ -6,6 +6,9 @@ import time
 import traceback
 from typing import Dict, Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
 class DockerContainer:
     """管理Docker容器的简单类"""
     def __init__(
@@ -164,17 +167,18 @@ if __name__ == '__main__':
         return "'" + escaped_code.replace('\n', '\\n') + "'"
 
     # 测试容器启动和代码执行
-    container = DockerContainer(auto_remove=False)
+    container = DockerContainer(container_name='llamaindex-executor-default', auto_remove=False)
     try:
         # 测试容器启动
         container.start()
         print("容器启动测试成功")
-        
+        container.set_work_dir("/Users/pingcy/workspace/tasks/default/TASK-557c26c1")
+
         # 测试Python代码执行
-        python_code1 = '''print('Hello from Python!')
+        python_code = '''print('Hello from Python!')
 import os
 print(os.getcwd())'''
-        result = container.execute(python_code1)
+        result = container.execute(python_code)
         print("Python执行结果:", result)
   
         # 测试Shell脚本执行
@@ -184,105 +188,8 @@ ls -l'''
         result = container.execute(shell_code, language="sh")
         print("Shell执行结果:", result)
 
-        # 测试Python代码执行
-        python_code = '''
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import traceback
-import os
-from openai import OpenAI
-
-# Set matplotlib Chinese font for container execution
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei']
-plt.rcParams['axes.unicode_minus'] = False
-
-def analyze_csv(file_path):
-    try:
-        # Read CSV file
-        df = pd.read_csv(file_path)
-        
-        # Data exploration
-        print("Data Overview:")
-        print(df.head())
-        print("\nData Summary:")
-        print(df.describe())
-        print("\nMissing Values:")
-        print(df.isnull().sum())
-
-        # Distribution plots
-        numeric_cols = df.select_dtypes(include=[np.number]).columns
-        if len(numeric_cols) > 0:
-            for col in numeric_cols:
-                plt.figure(figsize=(8, 6))
-                df[col].hist(bins=20)
-                plt.title(f'Distribution of {col}')
-                plt.xlabel(col)
-                plt.ylabel('Frequency')
-                plt.savefig(f'{col}_distribution.png')
-                plt.close()
-                print(f"\nSaved distribution plot for {col}")
-
-        # Comparison charts
-        if len(numeric_cols) >= 2:
-            plt.figure(figsize=(10, 6))
-            df[numeric_cols[:2]].boxplot()
-            plt.title('Comparison of first two numeric columns')
-            plt.savefig('numeric_comparison.png')
-            plt.close()
-            print("\nSaved numeric comparison plot")
-
-        # Pivot tables
-        categorical_cols = df.select_dtypes(include=['object']).columns
-        if len(categorical_cols) > 0 and len(numeric_cols) > 0:
-            pivot = pd.pivot_table(df, 
-                                 index=categorical_cols[0], 
-                                 values=numeric_cols[0], 
-                                 aggfunc='mean')
-            print("\nPivot Table:")
-            print(pivot)
-
-        # Generate pyramid principle analysis using GPT-4o
-        client = OpenAI()
-        
-        prompt = f"""Perform a pyramid principle analysis on this dataset:
-        {df.head().to_string()}
-        
-        Key findings:
-        1. 
-        2. 
-        3. 
-        
-        Recommendations:
-        1. 
-        2. 
-        3."""
-        
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a data analysis assistant."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        print("\nPyramid Principle Analysis:")
-        print(response.choices[0].message.content)
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        print(traceback.format_exc())
-
-if __name__ == "__main__":
-    target_file = '/Users/pingcy/workspace/tasks/default/TASK-efd8d0bf/2.csv'
-    if os.path.exists(target_file):
-        analyze_csv(target_file)
-    else:
-        print(f"Error: File not found at {target_file}")
-'''
-
-        container.set_work_dir("/Users/pingcy/workspace/tasks/default/TASK-efd8d0bf")
-        python_code = 'import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport traceback\nimport os\nfrom openai import OpenAI\n\n# Set matplotlib Chinese font for container execution\nplt.rcParams[\'font.sans-serif\'] = [\'WenQuanYi Zen Hei\', \'SimHei\']\nplt.rcParams[\'axes.unicode_minus\'] = False\n\ndef analyze_csv(file_path):\n    try:\n        # Read CSV file\n        df = pd.read_csv(file_path)\n        \n        # Data exploration\n        print("Data Overview:")\n        print(df.head())\n        print("\\nData Summary:")\n        print(df.describe())\n        print("\\nMissing Values:")\n        print(df.isnull().sum())\n\n        # Distribution plots\n        numeric_cols = df.select_dtypes(include=[np.number]).columns\n        if len(numeric_cols) > 0:\n            for col in numeric_cols:\n                plt.figure(figsize=(8, 6))\n                df[col].hist(bins=20)\n                plt.title(f\'Distribution of {col}\')\n                plt.xlabel(col)\n                plt.ylabel(\'Frequency\')\n                plt.savefig(f\'{col}_distribution.png\')\n                plt.close()\n                print(f"\\nSaved distribution plot for {col}")\n\n        # Comparison charts\n        if len(numeric_cols) >= 2:\n            plt.figure(figsize=(10, 6))\n            df[numeric_cols[:2]].boxplot()\n            plt.title(\'Comparison of first two numeric columns\')\n            plt.savefig(\'numeric_comparison.png\')\n            plt.close()\n            print("\\nSaved numeric comparison plot")\n\n        # Pivot tables\n        categorical_cols = df.select_dtypes(include=[\'object\']).columns\n        if len(categorical_cols) > 0 and len(numeric_cols) > 0:\n            pivot = pd.pivot_table(df, \n                                 index=categorical_cols[0], \n                                 values=numeric_cols[0], \n                                 aggfunc=\'mean\')\n            print("\\nPivot Table:")\n            print(pivot)\n\n        # Generate pyramid principle analysis using GPT-4o\n        client = OpenAI()\n        \n        prompt = f"""Perform a pyramid principle analysis on this dataset:\n        {df.head().to_string()}\n        \n        Key findings:\n        1. \n        2. \n        3. \n        \n        Recommendations:\n        1. \n        2. \n        3."""\n        \n        response = client.chat.completions.create(\n            model="gpt-4o",\n            messages=[\n                {"role": "system", "content": "You are a data analysis assistant."},\n                {"role": "user", "content": prompt}\n            ]\n        )\n        \n        print("\\nPyramid Principle Analysis:")\n        print(response.choices[0].message.content)\n\n    except Exception as e:\n        print(f"Error occurred: {e}")\n        print(traceback.format_exc())\n\nif __name__ == "__main__":\n    target_file = \'/Users/pingcy/workspace/tasks/default/TASK-efd8d0bf/2.csv\'\n    if os.path.exists(target_file):\n        analyze_csv(target_file)\n    else:\n        print(f"Error: File not found at {target_file}")'
+        # 测试Shell脚本执行
+        python_code = 'import pandas as pd\nimport matplotlib.pyplot as plt\nimport matplotlib as mpl\nimport os\nfrom openai import OpenAI\n\n# 设置matplotlib中文字体\nmpl.rcParams[\'font.sans-serif\'] = [\'WenQuanYi Zen Hei\', \'SimHei\']\nmpl.rcParams[\'axes.unicode_minus\'] = False\n\n# 初始化OpenAI客户端\nclient = OpenAI()\n\ndef load_data():\n    """加载游戏模式数据"""\n    try:\n        # 使用正确的文件路径\n        df = pd.read_csv("/Users/pingcy/workspace/tasks/default/TASK-557c26c1/2.csv")\n        # 验证必要列是否存在\n        required_columns = [\'统计日期\', \'模式名称\', \'年龄\', \'社交玩法标签\', \'人均参与次数\', \'人数\']\n        if not all(col in df.columns for col in required_columns):\n            raise ValueError("数据文件缺少必要的列")\n        return df\n    except FileNotFoundError:\n        raise FileNotFoundError("未找到数据文件")\n    except Exception as e:\n        raise Exception(f"加载数据时出错: {str(e)}")\n\ndef plot_key_metrics_distribution(df):\n    """绘制关键指标分布图"""\n    try:\n        fig, axes = plt.subplots(2, 1, figsize=(10, 8))\n        \n        # 人均参与次数分布\n        df[\'人均参与次数\'].plot(kind=\'hist\', bins=20, ax=axes[0], color=\'skyblue\', edgecolor=\'black\')\n        axes[0].set_title(\'人均参与次数分布\')\n        axes[0].set_xlabel(\'人均参与次数\')\n        axes[0].set_ylabel(\'频数\')\n        \n        # 人数分布\n        df[\'人数\'].plot(kind=\'hist\', bins=20, ax=axes[1], color=\'lightgreen\', edgecolor=\'black\')\n        axes[1].set_title(\'人数分布\')\n        axes[1].set_xlabel(\'人数\')\n        axes[1].set_ylabel(\'频数\')\n        \n        plt.tight_layout()\n        plt.savefig(\'key_metrics_distribution.png\')\n        plt.close()\n    except Exception as e:\n        raise Exception(f"绘制关键指标分布图时出错: {str(e)}")\n\ndef plot_dimension_comparison(df):\n    """绘制不同维度对比图"""\n    try:\n        # 年龄组对比\n        age_group = df.groupby(\'年龄\')[\'人均参与次数\'].mean().sort_values()\n        plt.figure(figsize=(8, 5))\n        age_group.plot(kind=\'bar\', color=\'orange\')\n        plt.title(\'不同年龄组人均参与次数对比\')\n        plt.xlabel(\'年龄组\')\n        plt.ylabel(\'平均人均参与次数\')\n        plt.xticks(rotation=45)\n        plt.tight_layout()\n        plt.savefig(\'age_group_comparison.png\')\n        plt.close()\n        \n        # 社交玩法标签对比\n        social_tag = df.groupby(\'社交玩法标签\')[\'人均参与次数\'].mean().sort_values()\n        plt.figure(figsize=(8, 5))\n        social_tag.plot(kind=\'bar\', color=\'purple\')\n        plt.title(\'不同社交玩法标签人均参与次数对比\')\n        plt.xlabel(\'社交玩法标签\')\n        plt.ylabel(\'平均人均参与次数\')\n        plt.xticks(rotation=45)\n        plt.tight_layout()\n        plt.savefig(\'social_tag_comparison.png\')\n        plt.close()\n    except Exception as e:\n        raise Exception(f"绘制维度对比图时出错: {str(e)}")\n\ndef create_pivot_table(df):\n    """创建多维钻取透视表"""\n    try:\n        # 日期x模式x年龄组透视表\n        pivot = pd.pivot_table(df, \n                              values=[\'人均参与次数\', \'人数\'],\n                              index=[\'统计日期\', \'模式名称\', \'年龄\'],\n                              aggfunc={\'人均参与次数\': \'mean\', \'人数\': \'sum\'})\n        \n        # 保存透视表到Excel\n        with pd.ExcelWriter(\'game_mode_analysis.xlsx\') as writer:\n            pivot.to_excel(writer, sheet_name=\'多维钻取\')\n            \n            # 创建汇总透视表\n            summary_pivot = pd.pivot_table(df,\n                                         values=[\'人均参与次数\', \'人数\'],\n                                         index=[\'模式名称\'],\n                                         columns=[\'年龄\', \'社交玩法标签\'],\n                                         aggfunc={\'人均参与次数\': \'mean\', \'人数\': \'sum\'},\n                                         fill_value=0)\n            summary_pivot.to_excel(writer, sheet_name=\'汇总透视表\')\n    except Exception as e:\n        raise Exception(f"创建透视表时出错: {str(e)}")\n\ndef main():\n    try:\n        # 加载数据\n        df = load_data()\n        \n        # 1. 关键指标分布图\n        plot_key_metrics_distribution(df)\n        \n        # 2. 不同维度对比\n        plot_dimension_comparison(df)\n        \n        # 3. 多维钻取透视表\n        create_pivot_table(df)\n        \n        print("分析完成，结果已保存到当前目录")\n    except Exception as e:\n        print(f"执行过程中出错: {str(e)}")\n        exit(1)\n\nif __name__ == "__main__":\n    main()'       
         result = container.execute(python_code)
         print("Python执行结果:", result)
 
