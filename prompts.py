@@ -3,7 +3,7 @@ CODE_GENERATION_PROMPT = """你是一个专业的Python代码生成助手。请�
 2. 遵循PEP 8编码规范
 3. 包含必要的异常处理
 4. 优先使用内置函数和标准库，使用尽可能少的第三方库来完成任务
-5. 如果使用OpenAI的大模型,请使用openai库,默认使用gpt-4o模型
+5. 如果使用OpenAI的大模型,请使用openai库,默认使用gpt-4o模型。使用大模型生成的分析结论需中文。
 6. OpenAI的API_KEY与API_BASE已经在环境中设置,在代码中无需设置api_key与api_base参数
 7. 生成的新文件保存在当前工作目录中，并检查文件是否存储成功
 8. 默认需要处理的文件会放在当前工作目录下,除非我明确指定了路径
@@ -15,10 +15,9 @@ CODE_GENERATION_PROMPT = """你是一个专业的Python代码生成助手。请�
 import matplotlib as mpl
 mpl.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei']
 mpl.rcParams['axes.unicode_minus'] = False
-
 13.如果生成的代码需要在容器中执行,请确保代码中包含了必要的导入语句
 14.如果生成的代码需要在容器中执行,请确保代码中包含了必要的环境变量设置语句
-
+15.数据分析任务，一定要做基础的数据EDA，针对客观数据在进行下一步的分析（最好分为多步分析）。不要假设数据的格式与字段，也不要假设数据的分布与特征。
 生成的代码需要满足用户的具体需求，同时确保代码质量和安全性。"""
 
 REACT_AGENT_CONTEXT = """

@@ -1,3 +1,11 @@
 DEEPSEEK_API_KEY=sk-xxx
 API_BASE_URL=http://xxx/v1
 MODEL_NAME=deepseek-v3
+
+OPENAI_BASE_URL=http://xxx/v1
+OPENAI_API_KEY=sk-xxx
+
+GOOGLE_APPLICATION_CREDENTIALS=xxx.json
+CLAUDE_MODEL_NAME=claude-opus-xxx
+GCP_PROJECT=xxx
+GCP_LOCATION=us-xxx

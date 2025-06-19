@@ -9,7 +9,7 @@ from llama_index.llms.ollama import Ollama
 import asyncio
 from tool_code_executor import create_task_workspace
 from tool_code_executor import create_code_executor_docker_tool,create_code_executor_local_tool,close_docker_container,create_browser_docker_tool
-from tool_code_generator import create_code_generator_tool
+from tool_code_generator import create_code_generator_tool, get_model
 from tool_webpage_crawler import create_webpage_crawler_tool
 from llama_index.core.llms import ChatMessage
 from prompts import REACT_AGENT_CONTEXT,DEFAULT_INITIAL_PLAN_PROMPT,DEFAULT_PLAN_REFINE_PROMPT
@@ -18,6 +18,7 @@ from llama_index.core.agent import (
     FunctionCallingAgentWorker,
     ReActAgentWorker,
 )
+
 import shutil
 import os
 from dotenv import load_dotenv
@@ -29,6 +30,9 @@ _agents: Dict[str, ReActAgent] = {}
 def generate_task_id():
     """生成一个TASK开头的唯一ID"""
     return f"TASK-{str(uuid.uuid4())[:8]}"
+
+# model_name = "claude-opus-4"
+model_name = "deepseek-v3"
 
 def get_agent(
     user_id: str = "default",
@@ -42,22 +46,19 @@ def get_agent(
 
         # 如果没有提供LLM，创建默认的LLM
         if llm is None:
-            llm = LangChainLLM(llm=ChatOpenAI(
-                    model=os.getenv('MODEL_NAME', 'deepseek-v3'),
-                    base_url=os.getenv('API_BASE_URL'),
-                    api_key=os.getenv('DEEPSEEK_API_KEY')
-                ))
-        
+            llm = LangChainLLM(get_model(model_name))
+            # llm = LangChainLLM(get_model("deepseek-v3"))
+
         # 创建用户专属的工具实例
         tool_code_executor_docker = create_code_executor_docker_tool()
         tool_browser_docker = create_browser_docker_tool()
-        tool_code_generator = create_code_generator_tool()
+        tool_code_generator = create_code_generator_tool(model_name)
         tool_webpage_crawler = create_webpage_crawler_tool()  # 新增网页采集工具
         
         # 创建用户专属的Agent
         
         _agents[user_id] = ReActAgent.from_tools(
-            max_iterations=20,
+            max_iterations=50,
             tools=[
                 tool_code_generator,
                 tool_code_executor_docker, 
@@ -123,7 +124,6 @@ async def test_react_agent():
             workspace_path = create_task_workspace(user_id, task_id)
 
             if filename:
-
                 # 检查文件是否存在
                 source_path = os.path.join(workspace_path, '../data', filename)
                 print(f"source_path: {source_path}")

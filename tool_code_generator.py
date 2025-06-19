@@ -4,9 +4,51 @@ from typing import Dict, Any
 from llama_index.core.tools import FunctionTool
 from langchain_openai import ChatOpenAI
 from llama_index.llms.langchain import LangChainLLM
+from langchain_google_vertexai.model_garden import ChatAnthropicVertex
+import logging
+
 from prompts import CODE_GENERATION_PROMPT
 from dotenv import load_dotenv
 load_dotenv()
+
+def get_model(model_name, **kwargs):
+    """Get a model by name."""
+
+    print(f"model: {model_name}")
+    if model_name == "deepseek-v3":
+        model = ChatOpenAI(
+            model="deepseek-v3-cdp",
+            temperature=0,
+            max_tokens=8192,
+            timeout=None,
+            max_retries=2,
+            api_key=os.getenv('DEEPSEEK_API_KEY'),
+            base_url=os.getenv('API_BASE_URL'),
+        )
+    elif model_name.startswith("gpt-"):
+        model = ChatOpenAI(
+            model=model_name,
+            temperature=0,
+            max_tokens=None,
+            timeout=None,
+            max_retries=2,
+            api_key=os.environ["OPENAI_API_KEY"],
+            base_url=f'{os.environ["OPENAI_BASE_URL"]}',
+        )
+    elif model_name == "claude-opus-4":
+        model = ChatAnthropicVertex(
+            model=os.environ["CLAUDE_MODEL_NAME"], 
+            temperature=0,
+            max_tokens=8192,
+            max_retries=6,
+            stop=None,
+            project=os.environ["GCP_PROJECT"], 
+            location=os.environ["GCP_LOCATION"]
+        )
+    else:
+        raise ValueError
+    
+    return model
 
 def create_code_generator_tool(
     model_name: str = "gpt-4o"
@@ -31,11 +73,7 @@ def create_code_generator_tool(
         Returns:
             str: 生成的Python代码
         """
-        llm = LangChainLLM(llm=ChatOpenAI(
-                model=os.getenv('MODEL_NAME', 'deepseek-v3'),
-                base_url=os.getenv('API_BASE_URL'),
-                api_key=os.getenv('DEEPSEEK_API_KEY')
-            ))
+        llm = LangChainLLM(llm=get_model(model_name))
         
         prompt = f"""{CODE_GENERATION_PROMPT}
 
